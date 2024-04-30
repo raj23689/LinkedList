@@ -275,4 +275,4 @@ main ()
 
 ** Notes
    - If you encounter any errors during compilation, check that you have the correct version of CMake and a proper C++ compiler installed.
-   - The instructions assume you are using a Unix-like operating system. For Windows, the process may vary slightly, especially if you are using an environment like Cygwin or MinGW, but its should be okay since `CMakeLists.txt` is OS agnostic.
+   - The instructions assume you are using a Unix-like operating system. For Windows, the process may vary slightly, especially if you are using an environment like Cygwin or MinGW, but it should be okay since =CMakeLists.txt= is OS agnostic.
