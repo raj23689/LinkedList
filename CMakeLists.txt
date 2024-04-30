@@ -15,17 +15,18 @@ target_include_directories(linkedlist PRIVATE src/lib)
 
 # Set compiler flags
 if(MSVC)
-    # MSVC compiler options
-    target_compile_options(linkedlist PRIVATE
-        /W4 # Warning level 4 (highest)
-        /WX # Treat warnings as errors
-    )
+  # MSVC compiler options
+  target_compile_options(
+    linkedlist PRIVATE /W4 # Warning level 4 (highest)
+                       /WX # Treat warnings as errors
+  )
 else()
-    # GCC/Clang compiler options
-    target_compile_options(linkedlist PRIVATE
-        -Wall # Enable all warnings
-        -Wextra # Enable extra warnings
-        -pedantic # Enforce strict adherence to the C++ standard
-        -Werror # Treat warnings as errors
-    )
+  # GCC/Clang compiler options
+  target_compile_options(
+    linkedlist
+    PRIVATE -Wall # Enable all warnings
+            -Wextra # Enable extra warnings
+            -pedantic # Enforce strict adherence to the C++ standard
+            -Werror # Treat warnings as errors
+  )
 endif()
