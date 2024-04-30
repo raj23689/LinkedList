@@ -1,0 +1,278 @@
+#+TITLE: LinkedList Implementaion In C++
+#+AUTHOR: Raj Majumdar
+#+DESC: LinkedList in C++17.
+#+DATE: [30 Apr 2024]
+
+* LinkedList Class Implementation
+** linkedlist.hpp
+   - The header file for the LinkedList class.
+   - Contains declarations for the LinkedList class and its member functions.
+   - Defines a Node struct with an integer value and a unique_ptr to the next node.
+   - Public member functions:
+     + Constructor: Initializes the list.
+     + Destructor: Cleans up the list.
+     + append: Adds a new element to the end of the list.
+     + removeAt: Removes the element at a specific index.
+     + insertAt: Inserts a new element at a specific index.
+     + get: Retrieves the element at a specific index.
+     + printList: Prints all elements in the list.
+   - Private member variables:
+     + A unique_ptr to the head node.
+
+#+BEGIN_SRC cpp
+//===-- LinkedList/linkedlist.hpp - definition --------*-C++-*-=------===//
+//
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file linkedlist.hpp
+/// \brief This file contains the declarations for the LinkedList class.
+///
+///
+//===----------------------------------------------------------------------===//
+
+// LinkedList.hpp
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
+
+#include <iostream>
+#include <memory>
+
+class LinkedList
+{
+public:
+  /// Default constructor.
+  LinkedList ();
+
+  /// Destructor.
+  ~LinkedList ();
+
+  /// Inserts a new element at the end of the LinkedList.
+  ///
+  /// \param value The value to insert.
+  void append (int value);
+
+  /// Removes the element at the specified index.
+  ///
+  /// \param index The index of the element to remove.
+  void removeAt (int index);
+
+  /// Inserts a new element at the specified index.
+  ///
+  /// \param index The index at which to insert the new element.
+  /// \param value The value to insert.
+  void insertAt (int index, int value);
+
+  /// Retrieves the element at the specified index.
+  ///
+  /// \param index The index of the element to retrieve.
+  /// \return The value of the element at the given index.
+  int get (int index) const;
+
+  /// Prints the entire LinkedList.
+  void printList () const;
+
+private:
+  struct Node
+  {
+    int value;
+    std::unique_ptr<Node> next;
+  };
+
+  std::unique_ptr<Node> head;
+};
+
+#endif // LINKEDLIST_H
+#+END_SRC
+
+** linkedlist.cpp
+   - The implementation file for the LinkedList class.
+   - Includes the "linkedlist.hpp" header file.
+   - Implements the member functions declared in the header file.
+   - Uses std::move to transfer ownership of nodes during removal and insertion.
+   - Throws std::out_of_range exception if an index is out of bounds.
+
+#+BEGIN_SRC cpp
+// LinkedList.cpp
+#include "lib/linkedlist.hpp"
+
+#include <stdexcept>
+
+LinkedList::LinkedList () : head (nullptr) {}
+
+LinkedList::~LinkedList ()
+{
+  while (head)
+    {
+      head = std::move (head->next);
+    }
+}
+
+void
+LinkedList::append (int value)
+{
+  if (!head)
+    {
+      head = std::make_unique<Node> ();
+      head->value = value;
+    }
+  else
+    {
+      Node *current = head.get ();
+      while (current->next)
+        {
+          current = current->next.get ();
+        }
+      current->next = std::make_unique<Node> ();
+      current->next->value = value;
+    }
+}
+
+void
+LinkedList::removeAt (int index)
+{
+  if (index == 0 && head)
+    {
+      head = std::move (head->next);
+      return;
+    }
+
+  Node *current = head.get ();
+  for (int i = 0; current && i < index - 1; ++i)
+    {
+      current = current->next.get ();
+    }
+
+  if (current && current->next)
+    {
+      current->next = std::move (current->next->next);
+    }
+}
+
+void
+LinkedList::insertAt (int index, int value)
+{
+  if (index == 0)
+    {
+      auto newNode = std::make_unique<Node> ();
+      newNode->value = value;
+      newNode->next = std::move (head);
+      head = std::move (newNode);
+      return;
+    }
+
+  Node *current = head.get ();
+  for (int i = 0; current && i < index - 1; ++i)
+    {
+      current = current->next.get ();
+    }
+
+  if (current)
+    {
+      auto newNode = std::make_unique<Node> ();
+      newNode->value = value;
+      newNode->next = std::move (current->next);
+      current->next = std::move (newNode);
+    }
+  else
+    {
+      // If the index is out of bounds, throw an exception
+      throw std::out_of_range ("Index out of range");
+    }
+}
+
+int
+LinkedList::get (int index) const
+{
+  Node *current = head.get ();
+  for (int i = 0; current && i < index; ++i)
+    {
+      current = current->next.get ();
+    }
+
+  if (current)
+    {
+      return current->value;
+    }
+
+  throw std::out_of_range ("Index out of range");
+}
+
+void
+LinkedList::printList () const
+{
+  Node *current = head.get ();
+  while (current != nullptr)
+    {
+      std::cout << current->value << " -> ";
+      current = current->next.get ();
+    }
+  std::cout << "null" << std::endl;
+}
+#+END_SRC
+
+** main.cpp
+   - The main driver code that demonstrates the usage of the LinkedList class.
+   - Includes the "linkedlist.hpp" header file.
+   - Creates a LinkedList object and appends three integers to it.
+   - Attempts to retrieve and print the value at index 1.
+   - Catches and handles std::out_of_range exception if thrown.
+
+#+BEGIN_SRC cpp
+// main.cpp
+#include "lib/linkedlist.hpp"
+#include <iostream>
+#include <ostream>
+
+int
+main ()
+{
+  LinkedList list;
+  list.append (10);
+  list.append (20);
+  list.append (30);
+
+  try
+    {
+      std::cout << "Value at index 1: " << list.get (1) << std::endl;
+    }
+  catch (const std::out_of_range &e)
+    {
+      std::cerr << e.what () << std::endl;
+    }
+
+  // print the linkedList
+  std::cout << "The LL has: ";
+  list.printList ();
+  list.removeAt (1);
+
+  std::cout << "Inserting at: pos 1 with value 15" << std::endl;
+  list.insertAt (1, 15);
+
+  std::cout << "Inserting at: end with value 5" << std::endl;
+  list.append (5);
+
+  std::cout << "The new LL has: ";
+  list.printList ();
+
+  return 0;
+}
+
+#+END_SRC
+
+* Compiling and Running the LinkedList Code
+** Compilation
+   - Navigate to the root directory of the project where the CMakeLists.txt is located.
+   - Create a new directory for the build: =mkdir build=
+   - Change to the build directory: =cd build=
+   - Run CMake to generate the Makefile: =cmake ..=
+   - Compile the code: =make=
+   - This will generate the executable files in the build directory.
+
+** Running
+   - After compilation, you can run the executable by typing: =./LinkedList= (or the name of your generated executable)
+   - Ensure you are still in the build directory to execute this command.
+
+** Notes
+   - If you encounter any errors during compilation, check that you have the correct version of CMake and a proper C++ compiler installed.
+   - The instructions assume you are using a Unix-like operating system. For Windows, the process may vary slightly, especially if you are using an environment like Cygwin or MinGW, but its should be okay since `CMakeLists.txt` is OS agnostic.
