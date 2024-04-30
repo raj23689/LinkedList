@@ -10,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 file(GLOB SOURCES "src/*.cpp")
 add_executable(linkedlist ${SOURCES})
 
-# Include the directory where linkedlist.hpp is located
+# Include the directory where headerfiles are located
 target_include_directories(linkedlist PRIVATE src/lib)
 
 # Set compiler flags
