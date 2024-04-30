@@ -13,10 +13,6 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-/// \file LinkedList.hpp
-///
-/// \brief This file contains the declarations for the LinkedList class.
-
 #include <iostream>
 #include <memory>
 
